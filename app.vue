@@ -80,7 +80,7 @@ const report = computed(() => {
 })
 </script>
 <template>
-<h2>Configuration</h2>
+<h2>Investment Configuration</h2>
 <form action="#">
   <div v-for="(idx, key) in form" class="form-group">
     <label :for="key">{{ camelCaseToTitleCase(key) }}</label>
