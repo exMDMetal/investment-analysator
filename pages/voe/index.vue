@@ -1,28 +1,9 @@
 <script setup lang="ts">
-import type { TableItem } from '~/types';
-
 const route = useRoute()
-const data = ref<TableItem[]>([])
+const { disconnectionTable, loadVoe } = useVoe()
 
-onMounted(async () => {
-    $fetch('/api/voe', { params: route.query }).then((res) => {
-        data.value = res
-    })
-
-    // if ('serviceWorker' in navigator) {
-    //     navigator.serviceWorker.register('/service-worker.js')
-    //         .then(function() {
-    //             console.log('Service Worker Registered');
-    //         })
-    //         .catch(function(error) {
-    //             console.log('Service Worker Registration failed: ', error);
-    //         })
-
-    //         debugger
-    //     navigator.serviceWorker.ready.then(function(registration) {
-    //         return registration.sync.register('sync-data', { params: route.query });
-    //     });
-    // }
+onMounted(() => {
+    loadVoe({ house: route.query.house as string, turn: route.query.turn as string | undefined })
 })
 </script>
 
@@ -30,7 +11,7 @@ onMounted(async () => {
   <div>
     <h1>Дані з Вінниця обл енерго</h1>
     <div class="disconnection-detailed-table-container">
-      <template v-for="(cell, index) in data" :class="cell.classList" :key="index">
+      <template v-for="(cell, index) in disconnectionTable" :class="cell.classList" :key="index">
         <div :class="cell.classList">{{ cell.classList.includes('cell') ? '' : cell.text }}</div>
       </template>
     </div>

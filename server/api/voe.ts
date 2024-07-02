@@ -1,30 +1,20 @@
-
-import { JSDOM } from 'jsdom'
-import { DisconnectionTable, TableClass } from '~/types'
-
-type HouseParams = {
+type QueryParams = {
     house: string
-    turn?: string
-}
-
-function houseParamsToId(params: HouseParams) {
-    return `${params.house}-${params.turn}`
 }
 
 export default defineCachedEventHandler(async (event) => {
-    const houseParams = getQuery<HouseParams>(event)
+    const { house } = getQuery<QueryParams>(event)
 
-    if (!houseParams.house) {
+    if (!house) {
         throw new Error('House is required')
     }
 
-    const rawDisconnectedTable = await getDisconnectionTable(houseParams.house)
-    const parsedDisconnectedTable = parseDisconnectionTable(rawDisconnectedTable, houseParams.turn)
+    const rawDisconnectedTable = await getDisconnectionTable(house)
 
-    return parsedDisconnectedTable
+    return rawDisconnectedTable
 }, {
     getKey(event) {
-        return houseParamsToId(getQuery<HouseParams>(event))
+        return getQuery<QueryParams>(event).house
     },
     base: 'voe',
     maxAge: 10 * 1000,
@@ -44,29 +34,30 @@ async function getDisconnectionTable(house: string) {
     }) as any
 }
 
-function parseDisconnectionTable(item: any, turn?: string): DisconnectionTable {
-    const body = item.at(-1).data
-    const dom = new JSDOM(body)
-    const document = dom.window.document
-    const tables = document.querySelectorAll('.disconnection-detailed-table')
-    const currentTable = turn ? Array.from(tables).find((table) => {
-        const heading = table.children[0].textContent
+// function parseDisconnectionTable(item: any, turn?: string): DisconnectionTable {
+//     const body = item.at(-1).data
+//     // const dom = new JSDOM(body)
+//     const $ = cheerio.load(body)
+//     // const document = dom.window.document
+//     const tables = $('.disconnection-detailed-table')
+//     const currentTable = turn ? Array.from(tables).find((table) => {
+//         const heading = table.children[0].textContent
         
-        return heading?.includes(turn)
-    }) : tables[0]
+//         return heading?.includes(turn)
+//     }) : tables[0]
 
-    const tableContainer = currentTable?.querySelector('.disconnection-detailed-table-container')
+//     const tableContainer = currentTable?.querySelector('.disconnection-detailed-table-container')
 
-    if (!tableContainer) {
-        throw new Error('Table not found')
-    }
+//     if (!tableContainer) {
+//         throw new Error('Table not found')
+//     }
 
-    const rows = Array.from(tableContainer.children)
+//     const rows = Array.from(tableContainer.children)
 
-    return rows.map((row) => {
-        return {
-            text: row.textContent,
-            classList: [].slice.call(row.classList) as TableClass[]
-        }
-    })
-}
+//     return rows.map((row) => {
+//         return {
+//             text: row.textContent,
+//             classList: [].slice.call(row.classList) as TableClass[]
+//         }
+//     })
+// }
