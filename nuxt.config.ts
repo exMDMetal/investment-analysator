@@ -2,6 +2,12 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
   nitro: {
-    preset: 'vercel-edge'
+    preset: 'vercel-edge',
+    storage: {
+      voe: { driver: 'fs', base: './db' }
+    },
+    devStorage: {
+      voe: { driver: 'fs', base: './db' }
+    }
   }
 })
