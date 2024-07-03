@@ -2,7 +2,7 @@ type QueryParams = {
     house: string
 }
 
-export default defineCachedEventHandler(async (event) => {
+export default defineEventHandler(async (event) => {
     const { house } = getQuery<QueryParams>(event)
 
     if (!house) {
@@ -12,14 +12,16 @@ export default defineCachedEventHandler(async (event) => {
     const rawDisconnectedTable = await getDisconnectionTable(house)
 
     return rawDisconnectedTable
-}, {
-    getKey(event) {
-        return getQuery<QueryParams>(event).house
-    },
-    base: 'voe',
-    maxAge: 10 * 1000,
-    swr: false
-})
+}
+// , {
+//     getKey(event) {
+//         return getQuery<QueryParams>(event).house
+//     },
+//     base: 'voe',
+//     maxAge: 10 * 1000,
+//     swr: false
+// }
+)
 
 async function getDisconnectionTable(house: string) {
     const body = new FormData()
@@ -33,31 +35,3 @@ async function getDisconnectionTable(house: string) {
         mode: 'cors'
     }) as any
 }
-
-// function parseDisconnectionTable(item: any, turn?: string): DisconnectionTable {
-//     const body = item.at(-1).data
-//     // const dom = new JSDOM(body)
-//     const $ = cheerio.load(body)
-//     // const document = dom.window.document
-//     const tables = $('.disconnection-detailed-table')
-//     const currentTable = turn ? Array.from(tables).find((table) => {
-//         const heading = table.children[0].textContent
-        
-//         return heading?.includes(turn)
-//     }) : tables[0]
-
-//     const tableContainer = currentTable?.querySelector('.disconnection-detailed-table-container')
-
-//     if (!tableContainer) {
-//         throw new Error('Table not found')
-//     }
-
-//     const rows = Array.from(tableContainer.children)
-
-//     return rows.map((row) => {
-//         return {
-//             text: row.textContent,
-//             classList: [].slice.call(row.classList) as TableClass[]
-//         }
-//     })
-// }
